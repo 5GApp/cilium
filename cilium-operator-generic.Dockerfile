@@ -31,9 +31,14 @@ RUN go get -d github.com/google/gops && \
 FROM scratch
 ARG CILIUM_SHA=""
 LABEL cilium-sha=${CILIUM_SHA}
+
+#FROM docker.io/library/alpine:3.9.3 as certs
+#RUN apk --update add ca-certificates
+
+FROM quay.io/cilium/cilium-runtime:2020-07-20@sha256:935a3a38fca019ac2ccde486593869c05c9936a01920d1ce90cf2232a71ad4d6
 LABEL maintainer="maintainer@cilium.io"
 COPY --from=builder /go/src/github.com/cilium/cilium/operator/cilium-operator-generic /usr/bin/cilium-operator-generic
-COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+#COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=gops /go/bin/gops /bin/gops
 WORKDIR /
 CMD ["/usr/bin/cilium-operator-generic"]
