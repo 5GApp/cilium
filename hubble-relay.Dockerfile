@@ -1,5 +1,7 @@
 # (first line comment needed for DOCKER_BUILDKIT use)
 #
+ARG BASE_IMAGE=scratch
+
 FROM docker.io/library/golang:1.15.2 as builder
 ARG CILIUM_SHA=""
 LABEL cilium-sha=${CILIUM_SHA}
@@ -25,13 +27,12 @@ RUN go get -d github.com/google/gops && \
     CGO_ENABLED=0 go install && \
     strip /go/bin/gops
 
-#FROM scratch
-FROM quay.io/cilium/cilium-runtime:2020-06-02
+FROM ${BASE_IMAGE}
 ARG CILIUM_SHA=""
 LABEL cilium-sha=${CILIUM_SHA}
 LABEL maintainer="maintainer@cilium.io"
 COPY --from=builder /go/src/github.com/cilium/cilium/hubble-relay/hubble-relay /usr/bin/hubble-relay
-#COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=gops /go/bin/gops /bin/gops
 ENTRYPOINT ["/usr/bin/hubble-relay"]
 CMD ["serve"]
