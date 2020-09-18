@@ -9,7 +9,8 @@ ADD . /go/src/github.com/cilium/cilium
 WORKDIR /go/src/github.com/cilium/cilium/hubble-relay
 ARG NOSTRIP
 ARG LOCKDEBUG
-RUN make NOSTRIP=${NOSTRIP} LOCKDEBUG=${LOCKDEBUG}
+ARG RACE
+RUN make RACE=${RACE} NOSTRIP=${NOSTRIP} LOCKDEBUG=${LOCKDEBUG}
 
 FROM docker.io/library/alpine:3.11 as certs
 ARG CILIUM_SHA=""
